@@ -1,27 +1,13 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
-import { SequelizeModule } from '@nestjs/sequelize';
-import { LoggerMiddleware } from './logger/logger.middleware';
-import { AuthModule } from './auth/auth.module';
+import { LoggerMiddleware } from './middleware/logger/logger.middleware';
+import { DatabaseModule } from './modules/database.module';
+import { AuthModule } from './routes/auth/auth.module';
+import { UsersModule } from './routes/users/users.module';
 
 @Module({
-  imports: [
-    SequelizeModule.forRoot({
-      dialect: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      database: 'NEST',
-      username: 'postgres',
-      password: 'root',
-      autoLoadModels: true,
-      synchronize: true,
-      logging: false,
-    }),
-    UsersModule,
-    AuthModule,
-  ],
+  imports: [UsersModule, AuthModule, DatabaseModule],
   controllers: [AppController],
   providers: [AppService],
 })
