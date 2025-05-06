@@ -3,7 +3,7 @@ import { SequelizeOptions } from 'sequelize-typescript';
 import { Dialect } from 'sequelize';
 
 dotenv.config({
-    path: '.env.local'
+  path: '.env.local',
 });
 
 export const sequelizeConfig: SequelizeOptions = {

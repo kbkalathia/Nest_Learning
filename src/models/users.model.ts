@@ -1,7 +1,19 @@
 import { Table, Column, Model, DataType } from 'sequelize-typescript';
 
-@Table
+@Table({
+  tableName: 'Users',
+  freezeTableName: true,
+  timestamps: true,
+})
 export class User extends Model<User> {
+  @Column({
+    type: DataType.BIGINT,
+    allowNull: false,
+    primaryKey: true,
+    autoIncrement: true,
+  })
+  declare id: number;
+
   @Column({
     type: DataType.STRING,
     allowNull: false,
@@ -18,7 +30,6 @@ export class User extends Model<User> {
   @Column({
     type: DataType.STRING,
     allowNull: false,
-    unique: true,
   })
   password: string;
 }
