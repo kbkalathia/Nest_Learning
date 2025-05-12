@@ -17,9 +17,22 @@ export class JwtServiceClass {
     });
   }
 
+  generateRefreshToken(payload: any, expiresIn: string = '7d'): string {
+    return this.jwt.sign(payload, {
+      expiresIn,
+      secret: process.env.JWT_REFRESH_SECRET,
+    });
+  }
+
   verifyToken(token: string): any {
     return this.jwt.verify(token, {
       secret: process.env.JWT_SECRET,
+    });
+  }
+
+  verifyRefreshToken(token: string): any {
+    return this.jwt.verify(token, {
+      secret: process.env.JWT_REFRESH_SECRET,
     });
   }
 }

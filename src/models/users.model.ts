@@ -1,4 +1,5 @@
 import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { UserRole } from 'src/utils/enums';
 
 @Table({
   tableName: 'Users',
@@ -32,4 +33,18 @@ export class User extends Model<User> {
     allowNull: false,
   })
   password: string;
+
+  @Column({
+    type: DataType.ENUM(...Object.values(UserRole)),
+    allowNull: false,
+    defaultValue: UserRole.USER,
+  })
+  role: UserRole;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+    defaultValue: null,
+  })
+  refreshToken: string;
 }

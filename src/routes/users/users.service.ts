@@ -56,7 +56,13 @@ export class UsersService {
       throw new NotFoundException("Email doesn't exist");
     }
 
-    const { username, email, password } = existingUser.toJSON();
+    const {
+      id: user_id,
+      username,
+      email,
+      password,
+      role,
+    } = existingUser.toJSON();
 
     // Compare Password
     const isPasswordMatched = await this.helperService.comparePassword(
@@ -74,16 +80,31 @@ export class UsersService {
       id: existingUser.id,
       email,
       username,
+      role,
     };
 
-    const token = this.jwtService.generateToken(payload);
+    const accessToken = this.jwtService.generateToken(payload);
+    const refreshToken = this.jwtService.generateRefreshToken(payload);
+
+    // store user refresh token
+    await this.userModel.update(
+      {
+        refreshToken,
+      },
+      {
+        where: {
+          id: user_id,
+        },
+      },
+    );
 
     // Return Response
     return ResponseHelper.send({
       message: 'Login successful',
       data: {
-        token,
-        user: { username, email },
+        accessToken,
+        refreshToken,
+        user: { username, email, role },
       },
     });
   }
@@ -94,5 +115,13 @@ export class UsersService {
     });
 
     return existingUser;
+  }
+
+  async refreshAccessToken(refreshToken: string) {
+    // Verify Refresh Token
+    const isValidRefreshToken =
+      this.jwtService.verifyRefreshToken(refreshToken);
+
+      
   }
 }

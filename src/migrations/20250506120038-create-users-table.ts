@@ -1,6 +1,7 @@
 'use strict';
 import { Transaction } from 'sequelize';
 import { DataType } from 'sequelize-typescript';
+import { UserRole } from '../utils/enums';
 
 module.exports = {
   up: async ({ context }) => {
@@ -33,6 +34,12 @@ module.exports = {
           password: {
             type: DataType.STRING,
             allowNull: false,
+          },
+
+          role: {
+            type: DataType.ENUM(...Object.values(UserRole)),
+            allowNull: false,
+            defaultValue: UserRole.USER,
           },
 
           createdAt: {
