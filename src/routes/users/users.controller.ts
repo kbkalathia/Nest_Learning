@@ -29,8 +29,19 @@ export class UsersController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post('logout')
+  logout(@Body('user_id') user_id: number) {
+    try {
+      return this.usersService.logoutUser(user_id);
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post('refresh-access-token')
-  refreshUserAccessToken(@Body('refreshToken') refreshToken:string) {
+  refreshUserAccessToken(@Body('refreshToken') refreshToken: string) {
     try {
       return this.usersService.refreshAccessToken(refreshToken);
     } catch (error) {

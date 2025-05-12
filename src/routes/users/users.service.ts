@@ -109,6 +109,27 @@ export class UsersService {
     });
   }
 
+  async logoutUser(user_id: number) {
+    // Check if user exists in the database
+    let existingUser = await this.userExistById(user_id);
+
+    if (!existingUser) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Remove Refresh Token
+    await this.userModel.update(
+      {
+        refreshToken: null,
+      },
+      {
+        where: {
+          id: user_id,
+        },
+      },
+    );
+  }
+
   async emailExist(email: string) {
     const existingUser = await this.userModel.findOne({
       where: { email },
@@ -117,11 +138,50 @@ export class UsersService {
     return existingUser;
   }
 
+  async userExistById(user_id: number) {
+    const existingUser = await this.userModel.findOne({
+      where: { id: user_id },
+    });
+
+    return existingUser;
+  }
+
   async refreshAccessToken(refreshToken: string) {
     // Verify Refresh Token
-    const isValidRefreshToken =
-      this.jwtService.verifyRefreshToken(refreshToken);
+    const tokenDetails = this.jwtService.verifyRefreshToken(refreshToken);
 
-      
+    if (!tokenDetails) {
+      throw new UnauthorizedException('Invalid Refresh Token');
+    }
+
+    // User Details
+    let userDetails = await this.userModel.findOne({
+      where: {
+        id: tokenDetails.id,
+      },
+    });
+
+    if (!userDetails) {
+      throw new NotFoundException('User not found');
+    }
+
+    userDetails = userDetails.toJSON();
+
+    // In case of Refresh Token Mismatched
+    if (userDetails.refreshToken !== refreshToken) {
+      throw new UnauthorizedException('Invalid Refresh Token');
+    }
+
+    // Generate New Access Token
+    const payload = {
+      id: userDetails.id,
+      email: userDetails.email,
+      username: userDetails.username,
+      role: userDetails.role,
+    };
+
+    const newAccessToken = this.jwtService.generateToken(payload);
+
+    return { accessToken: newAccessToken };
   }
 }

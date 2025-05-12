@@ -46,5 +46,5 @@ export class User extends Model<User> {
     allowNull: true,
     defaultValue: null,
   })
-  refreshToken: string;
+  refreshToken: string | null;
 }
